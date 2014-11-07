@@ -7,15 +7,18 @@ module Main where
 
 import           Control.Applicative
 import           Data.Bifunctor
-import qualified Data.ByteString       as B
-import qualified Data.ByteString.Char8 as C8
+import qualified Data.ByteString           as B
+import qualified Data.ByteString.Char8     as C8
 import           Data.CSV.Conduit
-import qualified Data.List             as L
-import qualified Data.Map.Lazy         as M
+import qualified Data.List                 as L
+import qualified Data.Map.Lazy             as M
 import           Data.Monoid
-import qualified Data.Text             as T
-import           Data.Text.Encoding    (encodeUtf8)
+import qualified Data.Text                 as T
+import           Data.Text.Encoding        (encodeUtf8)
 import           Database.MySQL.Simple
+import           Options.Applicative       hiding (header)
+import qualified Options.Applicative       as A
+import           Options.Applicative.Types
 import           System.IO
 import           Text.HTML.TagSoup
 
@@ -30,9 +33,6 @@ sql :: Query
 sql =  "SELECT id, title, body FROM "
     <> recordsTable
     <> " WHERE body LIKE '%jpg%' OR body LIKE '%png%';"
-
-output :: FilePath
-output = "intersections-2.csv"
 
 header :: (B.ByteString, B.ByteString, B.ByteString, B.ByteString)
 header = ("Record ID", "Title", "URL", "Exists")
@@ -66,6 +66,7 @@ toMapRows (f1, f2, f3, f4) = (hrow :) . map row
         hrow = M.fromList [ (f1, f1)
                           , (f2, f2)
                           , (f3, f3)
+                          , (f4, f4)
                           ]
         row (v1, v2, v3, v4) = M.fromList [ (f1, cshow v1)
                                           , (f2, maybe "" encodeUtf8 v2)
@@ -82,8 +83,20 @@ writeOutput filename = writeCSVFile defCSVSettings filename WriteMode
 
 
 main :: IO ()
-main =   writeOutput output
-     .   toMapRows header
-     =<< mapM pingURL'
-     .   L.concatMap (spreadLast . second getImages)
-     =<< getBodies
+main = do
+    output <- execParser opt
+    getBodies >>= mapM pingURL'
+              .   L.concatMap (spreadLast . second getImages)
+              >>= writeOutput output
+              .   toMapRows header
+
+
+opt' :: Parser FilePath
+opt' = argument str (  metavar "OUTPUT"
+                    <> help "The output file to write to.")
+
+opt :: ParserInfo FilePath
+opt = info (helper <*> opt')
+           (  fullDesc
+           <> progDesc "Find IMGs in Neatline items' bodies and test them."
+           <> A.header "get-links -- Find IMGs in Neatline items' bodies and test them.")
