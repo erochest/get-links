@@ -4,6 +4,7 @@
 module Utils
     ( login
     , pingURL
+    , recordsTable
     ) where
 
 
@@ -14,6 +15,9 @@ import qualified Data.Text             as T
 import           Database.MySQL.Simple
 import           Network.Wreq          hiding (header)
 
+
+recordsTable :: Query
+recordsTable = "omeka_neatline_records"
 
 login :: ConnectInfo
 login = defaultConnectInfo { connectDatabase = "intersections" }

@@ -12,6 +12,7 @@ import qualified Data.ByteString.Char8 as C8
 import           Data.CSV.Conduit
 import qualified Data.List             as L
 import qualified Data.Map.Lazy         as M
+import           Data.Monoid
 import qualified Data.Text             as T
 import           Data.Text.Encoding    (encodeUtf8)
 import           Database.MySQL.Simple
@@ -26,9 +27,9 @@ type FullRecord = (Int, Maybe T.Text, T.Text, Bool)
 
 
 sql :: Query
-sql = "SELECT id, title, body \
-      \FROM omeka_neatline_records \
-      \WHERE body LIKE '%jpg%' OR body LIKE '%png%';"
+sql =  "SELECT id, title, body FROM "
+    <> recordsTable
+    <> " WHERE body LIKE '%jpg%' OR body LIKE '%png%';"
 
 output :: FilePath
 output = "intersections-2.csv"

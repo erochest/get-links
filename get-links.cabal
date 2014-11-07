@@ -29,6 +29,7 @@ executable get-links
                      , containers
                      , wreq
                      , lens
+                     , optparse-applicative
   -- hs-source-dirs:      
   default-language:    Haskell2010
 
@@ -38,13 +39,10 @@ executable alter-links
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8
                      , mysql-simple
-                     , tagsoup
-                     , bifunctors
                      , text
-                     , bytestring
-                     , csv-conduit
-                     , containers
+                     , text-format
                      , wreq
                      , lens
+                     , optparse-applicative
   -- hs-source-dirs:      
   default-language:    Haskell2010
