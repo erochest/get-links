@@ -85,10 +85,8 @@ writeOutput filename = writeCSVFile defCSVSettings filename WriteMode
 main :: IO ()
 main = do
     output <- execParser opt
-    getBodies >>= mapM pingURL'
-              .   L.concatMap (spreadLast . second getImages)
-              >>= writeOutput output
-              .   toMapRows header
+    getBodies >>= mapM pingURL' . L.concatMap (spreadLast . second getImages)
+              >>= writeOutput output . toMapRows header
 
 
 opt' :: Parser FilePath
