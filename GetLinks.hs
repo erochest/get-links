@@ -6,8 +6,6 @@ module Main where
 
 
 import           Control.Applicative
-import           Control.Exception
-import           Control.Lens
 import           Data.Bifunctor
 import qualified Data.ByteString       as B
 import qualified Data.ByteString.Char8 as C8
@@ -17,17 +15,15 @@ import qualified Data.Map.Lazy         as M
 import qualified Data.Text             as T
 import           Data.Text.Encoding    (encodeUtf8)
 import           Database.MySQL.Simple
-import           Network.Wreq          hiding (header)
 import           System.IO
 import           Text.HTML.TagSoup
+
+import           Utils
 
 
 type RecordInfo = (Int, Maybe T.Text, T.Text)
 type FullRecord = (Int, Maybe T.Text, T.Text, Bool)
 
-
-login :: ConnectInfo
-login = defaultConnectInfo { connectDatabase = "intersections" }
 
 sql :: Query
 sql = "SELECT id, title, body \
@@ -57,15 +53,8 @@ getImages = filter (not . T.null)
 spreadLast :: (a, b, [c]) -> [(a, b, c)]
 spreadLast (a, b, cs) = map (a, b,) cs
 
-pingURL :: RecordInfo -> IO FullRecord
-pingURL (a, b, url) = do
-    putStr $ "Testing " ++ url' ++ " ... "
-    status <- catch ((^. responseStatus. statusCode) <$> get url')
-                    ((const $ return 404) :: SomeException -> IO Int)
-    putStrLn $ "status = " ++ show status
-    return (a, b, url, status == 200)
-    where
-        url' = T.unpack url
+pingURL' :: RecordInfo -> IO FullRecord
+pingURL' (a, b, url) = (a, b, url,) <$> pingURL url
 
 
 toMapRows :: (B.ByteString, B.ByteString, B.ByteString, B.ByteString)
@@ -94,6 +83,6 @@ writeOutput filename = writeCSVFile defCSVSettings filename WriteMode
 main :: IO ()
 main =   writeOutput output
      .   toMapRows header
-     =<< mapM pingURL
+     =<< mapM pingURL'
      .   L.concatMap (spreadLast . second getImages)
      =<< getBodies

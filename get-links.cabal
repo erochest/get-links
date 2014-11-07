@@ -17,7 +17,24 @@ cabal-version:       >=1.10
 
 executable get-links
   main-is:             GetLinks.hs
-  -- other-modules:       
+  other-modules:       Utils
+  -- other-extensions:    
+  build-depends:       base >=4.7 && <4.8
+                     , mysql-simple
+                     , tagsoup
+                     , bifunctors
+                     , text
+                     , bytestring
+                     , csv-conduit
+                     , containers
+                     , wreq
+                     , lens
+  -- hs-source-dirs:      
+  default-language:    Haskell2010
+
+executable alter-links
+  main-is:             AlterLinks.hs
+  other-modules:       Utils
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8
                      , mysql-simple
