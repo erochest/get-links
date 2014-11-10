@@ -16,6 +16,9 @@ specs: build
 run:
 	cabal run
 
+dump:
+	mysqldump -uroot intersections > intersections-`timestamp`.sql
+
 # docs:
 # generate api documentation
 #
