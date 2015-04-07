@@ -19,7 +19,7 @@ executable get-links
   main-is:             GetLinks.hs
   other-modules:       Utils
   -- other-extensions:    
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.7 && <4.9
                      , mysql-simple
                      , tagsoup
                      , bifunctors
@@ -37,7 +37,7 @@ executable alter-links
   main-is:             AlterLinks.hs
   other-modules:       Utils
   -- other-extensions:    
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.7 && <4.9
                      , mysql-simple
                      , text
                      , text-format
